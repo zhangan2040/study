@@ -8,9 +8,11 @@
 import urllib2
 import re
 import urllib
+import cookielib
 
 _UA = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 UA = _UA
+
 
 class StaticPage:
     global _UA
@@ -63,7 +65,7 @@ class StaticPage:
             return res
 
     def postData(self):
-        if self.data:
+        if self.data is not None:
             try:
                 pd = urllib.urlencode(self.data)
                 req = urllib2.Request(self.url, data=pd, headers=self.header)
@@ -79,3 +81,27 @@ class StaticPage:
                 return res
         else:
             raise Exception('Invalid Data', self.data)
+
+
+class CookieOpener:
+    def __init__(self, addheader=None):
+        # create a OpenerDirector instance, which can handle cookie
+        self.cookie = cookielib.CookieJar()
+        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
+        self.opener.addheaders = [
+            ('User-Agent', UA)
+        ]
+        if addheader is not None:
+            self.opener.addheaders += addheader
+
+    def post_data(self, post_url, data=None):
+        try:
+            if data is not None:
+                post_req = urllib2.Request(post_url, data=urllib.urlencode(data))
+            else:
+                post_req = urllib2.Request(post_url)
+            post_res = self.opener.open(post_req)
+        except 'Invalid Data':
+            return None
+        else:
+            return post_res
