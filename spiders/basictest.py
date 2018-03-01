@@ -85,7 +85,7 @@ class StaticPage:
 
 class CookieOpener:
     def __init__(self, addheader=None):
-        # create a OpenerDirector instance, which can handle cookie
+        # create an OpenerDirector instance, which can handle cookie
         self.cookie = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
         self.opener.addheaders = [
